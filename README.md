@@ -1,22 +1,16 @@
 # CurseGradle
 
-[![Build Status](https://travis-ci.org/matthewprenger/CurseGradle.svg?branch=master)](https://travis-ci.org/matthewprenger/CurseGradle)
+> This is a fork of [CurseGradle](https://github.com/matthewprenger/CurseGradle) by [matthewprenger](https://github.com/matthewprenger).
 
-A gradle plugin for publishing artifacts to [CurseForge](http://minecraft.curseforge.com/).
+A gradle plugin for publishing artifacts to [CurseForge](https://www.curseforge.com/).
 
-* IRC: `#matthewprenger` on [EsperNet](http://esper.net/)
-* [Wiki](https://github.com/matthewprenger/CurseGradle/wiki/)
-* [Changelog](https://github.com/matthewprenger/CurseGradle/releases)
+## Simple Quickstart
 
-## Simple Quickstart with ForgeGradle
-If you're using ForgeGradle, which you probably are, the following script is a bare-minimum. For more details about customization, check out the [Wiki](https://github.com/matthewprenger/CurseGradle/wiki).
-
-To find out which versions are available, check [HERE](https://plugins.gradle.org/plugin/com.matthewprenger.cursegradle).
+For more information red the [wiki of the original project](https://github.com/matthewprenger/CurseGradle/wiki/).
 
 ```gradle
 plugins {
-    id 'net.minecraftforge.gradle.forge' version '2.0.2'
-    id 'com.matthewprenger.cursegradle' version '<VERSION>'
+    id 'de.maxhenkel.cursegradle' version '<VERSION>'
 }
 
 curseforge {
