@@ -8,14 +8,14 @@ plugins {
 
 ext {
     inceptionYear = '2015'
-    url = 'https://github.com/matthewprenger/CurseGradle'
+    url = 'https://github.com/henkelmax/curse-gradle'
 }
 
 version = '1.5.0'
-group = 'com.matthewprenger'
+group = 'de.maxhenkel'
 description = 'Gradle plugin to upload artifacts to CurseForge'
 base {
-    archivesName = 'CurseGradle'
+    archivesName = 'cursegradle'
 }
 
 java {
@@ -87,11 +87,11 @@ tasks.named('jar') {
 
 gradlePlugin {
     website.set(project.url)
-    vcsUrl.set('https://github.com/matthewprenger/CurseGradle')
+    vcsUrl.set(project.url)
 
     plugins {
         register('curseGradlePlugin') {
-            id = 'com.matthewprenger.cursegradle'
+            id = 'de.maxhenkel.cursegradle'
             displayName = 'CurseGradle'
             description = project.description
             implementationClass = 'com.matthewprenger.cursegradle.CurseGradlePlugin'
