@@ -94,7 +94,7 @@ gradlePlugin {
     plugins {
         register('curseGradlePlugin') {
             id = 'de.maxhenkel.cursegradle'
-            displayName = 'CurseGradle'
+            displayName = 'cursegradle'
             description = project.description
             implementationClass = 'com.matthewprenger.cursegradle.CurseGradlePlugin'
             tags.set(['curseforge', 'publish', 'minecraft'])
