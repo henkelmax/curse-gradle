@@ -1,8 +1,9 @@
 plugins {
     id 'groovy'
     id 'idea'
-    id 'com.gradle.plugin-publish' version '0.12.0'
-    id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '1.3.1'
+    id 'com.gradleup.shadow' version '9.2.2'
 }
 
 ext {
@@ -10,16 +11,20 @@ ext {
     url = 'https://github.com/matthewprenger/CurseGradle'
 }
 
-version = '1.4.0'
+version = '1.5.0'
 group = 'com.matthewprenger'
 description = 'Gradle plugin to upload artifacts to CurseForge'
-archivesBaseName = 'CurseGradle'
+base {
+    archivesName = 'CurseGradle'
+}
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -38,12 +43,13 @@ jar.manifest.mainAttributes([
         'Implementation-Version': project.version
 ])
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
     from javadoc.destinationDir
     archiveClassifier.set('javadoc')
 }
 
-task sourcesJar(type: Jar) {
+tasks.register('sourcesJar', Jar) {
     from sourceSets.main.allSource
     archiveClassifier.set('sources')
 }
@@ -62,16 +68,34 @@ assemble.dependsOn javadocJar, sourcesJar
     it.options.fork = true
 }
 
-pluginBundle {
-    website = project.url
-    vcsUrl = 'https://github.com/matthewprenger/CurseGradle'
+tasks.named('shadowJar') {
+    archiveClassifier.set('')
+    mergeServiceFiles()
+
+    relocate 'com.google', 'com.matthewprenger.cursegradle.google'
+    relocate 'gnu.trove', 'com.matthewprenger.cursegradle.gnu.trove'
+    relocate 'org.apache', 'com.matthewprenger.cursegradle.org.apache'
+}
+
+tasks.named('assemble') {
+    dependsOn tasks.named('shadowJar')
+}
+
+tasks.named('jar') {
+    enabled = false
+}
+
+gradlePlugin {
+    website.set(project.url)
+    vcsUrl.set('https://github.com/matthewprenger/CurseGradle')
+
     plugins {
-        curseGradlePlugin {
+        register('curseGradlePlugin') {
             id = 'com.matthewprenger.cursegradle'
-            description = project.description
             displayName = 'CurseGradle'
-            version = project.version
-            tags = ['curseforge', 'publish', 'minecraft']
+            description = project.description
+            implementationClass = 'com.matthewprenger.cursegradle.CurseGradlePlugin'
+            tags.set(['curseforge', 'publish', 'minecraft'])
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.matthewprenger.cursegradle
 
 import com.google.common.base.Charsets
-import com.google.common.io.Files
 import com.google.gson.Gson
 import com.matthewprenger.cursegradle.jsonresponse.CurseError
 import org.apache.http.HttpResponse
@@ -38,7 +37,7 @@ class Util {
             return (File) obj
         }
         if (obj instanceof AbstractArchiveTask) {
-            return ((AbstractArchiveTask) obj).getArchivePath()
+            return ((AbstractArchiveTask) obj).getArchiveFile().get().asFile
         }
         return project.file(obj)
     }
@@ -52,8 +51,8 @@ class Util {
     static String resolveString(Object obj) {
         checkNotNull(obj)
 
-        while(obj instanceof Closure) {
-            obj = ((Closure)obj).call()
+        while (obj instanceof Closure) {
+            obj = ((Closure) obj).call()
         }
 
         if (obj instanceof String) {
@@ -84,7 +83,7 @@ class Util {
 
         HttpClient client = HttpClientBuilder.create()
                 .setDefaultRequestConfig(RequestConfig.custom()
-                .setCookieSpec(CookieSpecs.IGNORE_COOKIES).build()).build()
+                        .setCookieSpec(CookieSpecs.IGNORE_COOKIES).build()).build()
 
         HttpGet get = new HttpGet(new URI(url))
         get.setHeader('X-Api-Token', apiKey)

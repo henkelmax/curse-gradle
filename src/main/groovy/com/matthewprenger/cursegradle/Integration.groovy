@@ -1,11 +1,11 @@
 package com.matthewprenger.cursegradle
 
-import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.tasks.TaskProvider
 
 class Integration {
 
@@ -16,12 +16,12 @@ class Integration {
             if (project.plugins.hasPlugin('java')) {
                 log.info 'Java plugin detected, adding integration...'
                 if (curseProject.mainArtifact == null) {
-                    Task jarTask = project.tasks.getByName('jar')
+                    TaskProvider<Task> jarTask = project.tasks.named('jar')
                     log.info "Setting main artifact for CurseForge Project $curseProject.id to the java jar"
                     CurseArtifact artifact = new CurseArtifact()
-                    artifact.artifact = jarTask
+                    artifact.artifact = jarTask.get()
                     curseProject.mainArtifact = artifact
-                    curseProject.uploadTask.dependsOn jarTask
+                    curseProject.uploadTask.dependsOn jarTask.get()
                 }
             }
         } catch (Throwable t) {
@@ -30,25 +30,18 @@ class Integration {
     }
 
     static void checkJavaVersion(Project project, CurseProject curseProject) {
-
         try {
-            JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java")
-            JavaVersion javaVersion = JavaVersion.toVersion(javaConv.targetCompatibility)
-
-            if (JavaVersion.VERSION_1_6.compareTo(javaVersion) >= 0) {
-                curseProject.addGameVersion('Java 6')
+            def javaExt = project.extensions.findByType(JavaPluginExtension)
+            if (javaExt == null) {
+                log.warn('Failed to detect Java Version. Java plugin is not enabled.')
+                return
             }
-            if (JavaVersion.VERSION_1_7.compareTo(javaVersion) >= 0) {
-                curseProject.addGameVersion('Java 7')
+            def target = javaExt.targetCompatibility
+            if (target == null) {
+                log.warn('Failed to detect Java Version. "targetCompatibility" is not defined.')
+                return
             }
-            if (JavaVersion.VERSION_1_8.compareTo(javaVersion) >= 0) {
-                curseProject.addGameVersion('Java 8')
-            }
-            if (project.extensions.getByType(CurseExtension).curseGradleOptions.detectNewerJava) {
-                if (JavaVersion.VERSION_1_9.compareTo(javaVersion) >= 0) {
-                    curseProject.addGameVersion('Java 9')
-                }
-            }
+            curseProject.addGameVersion("Java ${target.getMajorVersion()}")
         } catch (Throwable t) {
             log.warn("Failed to check Java Version", t)
         }
