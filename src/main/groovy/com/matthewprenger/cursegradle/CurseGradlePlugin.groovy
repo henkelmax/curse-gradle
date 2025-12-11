@@ -16,10 +16,9 @@ class CurseGradlePlugin implements Plugin<Project> {
     static final Set<String> VALID_RELEASE_TYPES = ['alpha', 'beta', 'release']
     static final Set<String> VALID_RELATIONS = ['requiredDependency', 'embeddedLibrary', 'optionalDependency', 'tool', 'incompatible']
 
-    static final String API_BASE_URL = 'https://minecraft.curseforge.com'
-    static final String VERSION_TYPES_URL = "$API_BASE_URL/api/game/version-types"
-    static final String VERSION_URL = "$API_BASE_URL/api/game/versions"
-    static final String UPLOAD_URL = "$API_BASE_URL/api/projects/%s/upload-file"
+    static final String VERSION_TYPES_URL = "%s/api/game/version-types"
+    static final String VERSION_URL = "%s/api/game/versions"
+    static final String UPLOAD_URL = "%s/api/projects/%s/upload-file"
 
     Project project
     CurseExtension extension
@@ -28,7 +27,7 @@ class CurseGradlePlugin implements Plugin<Project> {
     void apply(final Project project) {
         this.project = project
 
-        final Task mainTask = project.tasks.create(TASK_NAME, DefaultTask)
+        final Task mainTask = project.tasks.register(TASK_NAME, DefaultTask).get()
         mainTask.description = "Uploads all CurseForge projects"
         mainTask.group = TASK_GROUP
 
@@ -43,11 +42,12 @@ class CurseGradlePlugin implements Plugin<Project> {
 
                 Util.check(!Strings.isNullOrEmpty(curseProject.id), "A CurseForge project was configured without an id")
 
-                CurseUploadTask uploadTask = project.tasks.create("curseforge$curseProject.id", CurseUploadTask)
+                CurseUploadTask uploadTask = project.tasks.register("curseforge$curseProject.id", CurseUploadTask).get()
                 curseProject.uploadTask = uploadTask
                 uploadTask.group = TASK_GROUP
                 uploadTask.description = "Uploads CurseForge project $curseProject.id"
                 uploadTask.additionalArtifacts = curseProject.additionalArtifacts
+                uploadTask.apiBaseUrl = curseProject.apiBaseUrl
                 uploadTask.apiKey = curseProject.apiKey
                 uploadTask.projectId = curseProject.id
 
@@ -70,11 +70,11 @@ class CurseGradlePlugin implements Plugin<Project> {
 
                 // At this stage, all artifacts should be in a state ready to upload
                 // ForgeGradle's reobf tasks are dependants of this
-                uploadTask.dependsOn project.tasks.getByName('assemble')
+                uploadTask.dependsOn project.tasks.named('assemble')
 
                 // Run after build if it's on the task graph. This is useful because if tests fail,
                 // the artifacts won't be uploaded
-                uploadTask.mustRunAfter project.tasks.getByName('build')
+                uploadTask.mustRunAfter project.tasks.named('build')
 
                 mainTask.dependsOn uploadTask
                 uploadTask.onlyIf { mainTask.enabled }

@@ -7,6 +7,11 @@ class CurseExtension {
      */
     def apiKey = '' // Initialize to empty string to delay error until the task is actually ran
 
+    /**
+     * Optional global apiBaseUrl. Will be applied to all projects that don't declare one
+     */
+    def apiBaseUrl = 'https://minecraft.curseforge.com'
+
     final Collection<CurseProject> curseProjects = new ArrayList<>()
 
     Options curseGradleOptions = new Options()
@@ -31,6 +36,9 @@ class CurseExtension {
         curseProject.with(configClosure)
         if (curseProject.apiKey == null) {
             curseProject.apiKey = this.apiKey
+        }
+        if (curseProject.apiBaseUrl == null) {
+            curseProject.apiBaseUrl = this.apiBaseUrl
         }
         curseProjects.add(curseProject)
     }

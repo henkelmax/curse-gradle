@@ -51,6 +51,11 @@ class CurseProject {
     def changelog = ''
 
     /**
+     * The API base URL
+     */
+    def apiBaseUrl
+
+    /**
      * The API key to be used for file uploads
      */
     def apiKey
@@ -66,7 +71,7 @@ class CurseProject {
      * @param artifact The artifact
      * @param configClosure Optional configuration closure
      */
-    void mainArtifact(def artifact, @DelegatesTo(CurseArtifact)Closure<?> configClosure = null) {
+    void mainArtifact(def artifact, @DelegatesTo(CurseArtifact) Closure<?> configClosure = null) {
         CurseArtifact curseArtifact = new CurseArtifact()
         if (configClosure != null) {
             curseArtifact.with(configClosure)
@@ -81,7 +86,7 @@ class CurseProject {
      * @param artifact The artifact
      * @param configClosure Optional configuration closure
      */
-    void addArtifact(def artifact, @DelegatesTo(CurseArtifact)Closure<?> configClosure = null) {
+    void addArtifact(def artifact, @DelegatesTo(CurseArtifact) Closure<?> configClosure = null) {
         CurseArtifact curseArtifact = new CurseArtifact()
         if (configClosure != null) {
             curseArtifact.with(configClosure)
@@ -104,7 +109,7 @@ class CurseProject {
      *
      * @param configureClosure The configuration closure
      */
-    void relations(@DelegatesTo(CurseRelation)Closure<?> configureClosure) {
+    void relations(@DelegatesTo(CurseRelation) Closure<?> configureClosure) {
         if (curseRelations == null) {
             curseRelations = new HashSet<>()
         }
@@ -156,6 +161,7 @@ class CurseProject {
      */
     void validate() {
         check(id != null, "Project id not set")
+        check(apiBaseUrl != null, "apiBaseUrl not set for project $id")
         check(apiKey != null, "apiKey not set for project $id")
         check(mainArtifact != null, "mainArtifact not set for project $id")
         check(!gameVersionStrings.isEmpty(), "No Minecraft version configured for project $id")

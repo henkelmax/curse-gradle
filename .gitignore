@@ -2,6 +2,7 @@
 /repo
 /.gradle
 /build
+/lib
 
 #Eclipse
 .settings
