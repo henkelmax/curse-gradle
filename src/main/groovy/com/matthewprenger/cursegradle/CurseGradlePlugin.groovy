@@ -53,7 +53,7 @@ class CurseGradlePlugin implements Plugin<Project> {
 
                 CurseExtension ext = project.extensions.getByType(CurseExtension)
 
-                if (ext.curseGradleOptions.javaVersionAutoDetect) {
+                if (ext.curseGradleOptions.javaVersionAutoDetect && !'dev.bukkit.org'.equalsIgnoreCase(new URI(curseProject.apiBaseUrl.toString()).host)) {
                     Integration.checkJavaVersion(project, curseProject)
                 }
 
